@@ -1,13 +1,85 @@
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
+const DEMO_MODE = true; // TEMPORARY: Set to false to use real API
 
 function getToken(): string | null {
   return localStorage.getItem('feedchain_token');
 }
 
+// Mock data for demo mode
+const MOCK_FOOD_POSTS: FoodPost[] = [
+  {
+    id: 'mock-post-1',
+    donor_id: 'demo-0000-0000-0000-000000000000',
+    food_type: 'Pizza',
+    quantity: '5 boxes',
+    expiry_time: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+    pickup_lat: 12.9716,
+    pickup_lng: 77.5946,
+    status: 'available',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'mock-post-2',
+    donor_id: 'demo-0000-0000-0000-000000000000',
+    food_type: 'Rice & Vegetables',
+    quantity: '10 kg',
+    expiry_time: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+    pickup_lat: 12.9352,
+    pickup_lng: 77.6245,
+    status: 'claimed',
+    created_at: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+  },
+];
+
+const MOCK_CLAIMS: Claim[] = [
+  {
+    id: 'mock-claim-1',
+    food_post_id: 'mock-post-2',
+    ngo_id: 'mock-ngo-1',
+    status: 'picked',
+    claimed_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+    picked_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+    people_served: 25,
+    distribution_location: 'Community Center',
+  },
+];
+
+const MOCK_IMPACT: ImpactSummary = {
+  meals_served: 1250,
+  active_ngos: 8,
+  successful_distributions: 94,
+};
+
 export async function api<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
+  // In demo mode, return mock data for protected endpoints
+  if (DEMO_MODE && path !== '/auth/register' && path !== '/auth/login') {
+    // Return mock data based on the endpoint
+    if (path === '/auth/me') {
+      return { user_id: 'demo-0000-0000-0000-000000000000', role: 'donor' } as T;
+    }
+    if (path === '/food-posts/my') {
+      return MOCK_FOOD_POSTS as T;
+    }
+    if (path === '/claims/my') {
+      return MOCK_CLAIMS as T;
+    }
+    if (path === '/impact/summary') {
+      return MOCK_IMPACT as T;
+    }
+    if (path === '/admin/overview') {
+      return { food_posts: MOCK_FOOD_POSTS, claims: MOCK_CLAIMS } as T;
+    }
+    // Return empty array or object for other GET requests
+    if (options.method !== 'POST' && options.method !== 'PUT' && options.method !== 'DELETE') {
+      return [] as T;
+    }
+    // Return success for mutations
+    return { message: 'Success (demo mode)' } as T;
+  }
+
   const token = getToken();
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
