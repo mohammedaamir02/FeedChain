@@ -160,7 +160,23 @@ Each transition is validated and enforced by the backend.
 ## Current Status
 - Backend fully implemented and tested
 - End-to-end flow verified
-- Frontend integration in progress
+- React frontend with donor/NGO/admin flows and impact page
+
+---
+
+## Running the project
+
+### Backend (FastAPI)
+- **Port:** `8000` (e.g. `http://localhost:8000`)
+- Copy `backend/.env.example` to `backend/.env` and set `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and optionally `JWT_SECRET_KEY`.
+- From repo root: `cd backend && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`
+- Health check: `GET http://localhost:8000/health`
+
+### Frontend (React + Vite)
+- **Port:** `5173` (e.g. `http://localhost:5173`)
+- Create `frontend/.env` with `VITE_API_URL=http://localhost:8000`.
+- From repo root: `cd frontend && npm install && npm run dev`
+- Demo login: choose role (Donor / NGO / Admin) and click Continue; no password required.
 
 ---
 

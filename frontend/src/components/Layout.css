@@ -1,0 +1,114 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: white;
+  text-decoration: none;
+}
+.logo:hover {
+  color: white;
+  text-decoration: none;
+  opacity: 0.95;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  text-decoration: none;
+}
+.nav-link.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.role-badge {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+.header-right .btn-ghost {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.7);
+}
+.header-right .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.main {
+  flex: 1;
+  padding: 2rem 0;
+}
+
+.footer {
+  background: var(--color-primary-dark);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 1.25rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .header-right {
+    gap: 0.5rem;
+  }
+  .nav-link span {
+    display: none;
+  }
+  .nav-link {
+    padding: 0.5rem;
+  }
+}

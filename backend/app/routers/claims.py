@@ -1,7 +1,9 @@
+from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, status
-from datetime import datetime
+from datetime import datetime, timezone
 from app.dependencies.auth import get_current_user
 from app.core.supabase import supabase
+from app.schemas.food import VerifyPickupRequest
 
 router = APIRouter(tags=["claims"])
 
@@ -26,7 +28,10 @@ def claim_food(post_id: str, current_user=Depends(get_current_user)):
     if food["status"] != "POSTED":
         raise HTTPException(status_code=400, detail="Food already claimed or unavailable")
 
-    if datetime.fromisoformat(food["expiry_time"]) <= datetime.utcnow():
+    expiry_dt = datetime.fromisoformat(str(food["expiry_time"]).replace("Z", "+00:00"))
+    if expiry_dt.tzinfo is None:
+        expiry_dt = expiry_dt.replace(tzinfo=timezone.utc)
+    if expiry_dt <= datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="Food has expired")
 
     # Create claim (DB-level lock via UNIQUE constraint)
@@ -49,6 +54,20 @@ def claim_food(post_id: str, current_user=Depends(get_current_user)):
     }).eq("id", post_id).execute()
 
     return {"message": "Food successfully claimed"}
+
+
+@router.get("/claims/my")
+def my_claims(current_user=Depends(get_current_user)):
+    if current_user["role"] != "ngo":
+        raise HTTPException(status_code=403, detail="Only NGOs can list claims")
+    result = (
+        supabase.table("claims")
+        .select("*, food_posts(*)")
+        .eq("ngo_id", current_user["user_id"])
+        .order("claimed_at", desc=True)
+        .execute()
+    )
+    return result.data
 
 
 @router.post("/claims/{claim_id}/cancel")
@@ -145,11 +164,11 @@ def pickup_food(claim_id: str, current_user=Depends(get_current_user)):
 
 
 @router.post("/claims/{claim_id}/verify")
-def verify_pickup(claim_id: str, payload: dict, current_user=Depends(get_current_user)):
+def verify_pickup(claim_id: str, payload: VerifyPickupRequest, current_user=Depends(get_current_user)):
     if current_user["role"] != "ngo":
         raise HTTPException(status_code=403, detail="Only NGOs can verify pickup")
 
-    otp_input = payload.get("otp")
+    otp_input = payload.otp
     if not otp_input:
         raise HTTPException(status_code=400, detail="OTP required")
 

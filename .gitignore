@@ -1,0 +1,25 @@
+# =====================
+# FRONTEND
+# =====================
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# =====================
+# BACKEND
+# =====================
+backend/venv/
+backend/.env
+backend/__pycache__/
+backend/**/*.pyc
+
+# =====================
+# COMMON
+# =====================
+.env
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
